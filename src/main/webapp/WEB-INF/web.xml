@@ -3,5 +3,22 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-  <display-name>Archetype Created Web Application</display-name>
+    <!-- 配置前端控制器 -->
+    <servlet>
+        <servlet-name>DispatchServlet</servlet-name>
+        <servlet-class>com.omega.summermvc.servlet.SummerDispatchServlet</servlet-class>
+        <!-- 设置在tomcat启动时, 就自动加载 -->
+        <load-on-startup>1</load-on-startup>
+        <!-- 指定要操作的Summer配置文件 -->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:summerApplicationContext.xml</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DispatchServlet</servlet-name>
+        <!-- 因为DispatchServlet是前端控制器, 所以需要拦截所有请求 -->
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
 </web-app>
