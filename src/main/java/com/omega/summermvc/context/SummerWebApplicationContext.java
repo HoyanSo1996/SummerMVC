@@ -1,6 +1,7 @@
 package com.omega.summermvc.context;
 
 import com.omega.summermvc.annotation.Controller;
+import com.omega.summermvc.annotation.Service;
 import com.omega.summermvc.util.XMLParserUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,6 +45,7 @@ public class SummerWebApplicationContext {
         // 初始化 singletonObjects
         initSingletonObject();
 
+        System.out.println(singletonObjects);
     }
 
     /**
@@ -82,6 +84,23 @@ public class SummerWebApplicationContext {
                 if (clazz.isAnnotationPresent(Controller.class)) {
                     String beanName = StringUtils.uncapitalize(clazz.getSimpleName());
                     singletonObjects.put(beanName, clazz.newInstance());
+
+                } else if (clazz.isAnnotationPresent(Service.class)) {
+                    // 通过 @Service 中的 value 进行装配
+                    String beanName = clazz.getAnnotation(Service.class).value();
+                    Object bean = clazz.newInstance();
+                    if (!"".equals(beanName)) {
+                       singletonObjects.put(beanName, bean);
+                    } else {
+                        // 通过 接口类型 方式进行装配.
+                        Class<?>[] interfaces = clazz.getInterfaces();
+                        for (Class<?> interfaceClazz : interfaces) {
+                            beanName = StringUtils.uncapitalize(interfaceClazz.getSimpleName());
+                            singletonObjects.put(beanName, bean);
+                        }
+                        // 通过 类的类型 方式进行装配
+                        singletonObjects.put(StringUtils.uncapitalize(clazz.getSimpleName()), bean);
+                    }
                 }
             }
         } catch (Exception e) {
