@@ -5,6 +5,7 @@ import com.omega.summermvc.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Class MonsterController
@@ -16,8 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 public class MonsterController {
 
     @RequestMapping("/monster/list")
-    public String queryList(HttpServletRequest request, HttpServletResponse response) {
-        System.out.println("MonsterController.queryList() ...");
+    public String queryList(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/html;charset=utf-8");
+        response.getWriter().write("<h1>展示 monster 列表</h1>");
         return null;
     }
 }

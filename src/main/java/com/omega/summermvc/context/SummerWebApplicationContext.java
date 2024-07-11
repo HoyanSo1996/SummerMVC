@@ -81,4 +81,8 @@ public class SummerWebApplicationContext {
             throw new RuntimeException(e);
         }
     }
+
+    public ConcurrentHashMap<String, Object> getSingletonObjects() {
+        return singletonObjects;
+    }
 }

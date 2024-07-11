@@ -1,6 +1,8 @@
 package com.omega.summermvc.servlet;
 
 import com.omega.summermvc.context.SummerWebApplicationContext;
+import com.omega.summermvc.handler.SummerHandler;
+import com.omega.summermvc.handlerMapping.SummerHandlerMapping;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -8,6 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Class SummerDispatchServlet
@@ -17,10 +21,14 @@ import java.io.IOException;
  */
 public class SummerDispatchServlet extends HttpServlet {
 
+    private final SummerWebApplicationContext summerApplicationContext = new SummerWebApplicationContext();
+    private final SummerHandlerMapping summerHandlerMapping = new SummerHandlerMapping();
+
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
-        SummerWebApplicationContext summerApplicationContext = new SummerWebApplicationContext();
         summerApplicationContext.init();
+        summerHandlerMapping.init(summerApplicationContext, servletConfig.getServletContext().getContextPath());
+
     }
 
     @Override
@@ -30,6 +38,7 @@ public class SummerDispatchServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        this.doPost(request, response);
+        doPost(request, response);
     }
+
 }
