@@ -1,13 +1,18 @@
 package com.omega.summermvc.context;
 
+import com.omega.summermvc.annotation.Autowired;
 import com.omega.summermvc.annotation.Controller;
 import com.omega.summermvc.annotation.Service;
 import com.omega.summermvc.util.XMLParserUtils;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -22,6 +27,7 @@ public class SummerWebApplicationContext {
 
     private final List<String> classFullPathList = new ArrayList<>();
 
+    @Getter
     private final ConcurrentHashMap<String, Object> singletonObjects = new ConcurrentHashMap<>();
 
 
@@ -45,7 +51,8 @@ public class SummerWebApplicationContext {
         // 初始化 singletonObjects
         initSingletonObject();
 
-        System.out.println(singletonObjects);
+        // 执行自动装配
+        executeAutowired();
     }
 
     /**
@@ -108,7 +115,37 @@ public class SummerWebApplicationContext {
         }
     }
 
-    public ConcurrentHashMap<String, Object> getSingletonObjects() {
-        return singletonObjects;
+    /**
+     * 执行自动装配
+     */
+    public void executeAutowired() {
+        if (singletonObjects.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, Object> singletonObjectEntrySet : singletonObjects.entrySet()) {
+            Object bean = singletonObjectEntrySet.getValue();
+            Class<?> beanClazz = bean.getClass();
+            for (Field field : beanClazz.getDeclaredFields()) {
+                if (!field.isAnnotationPresent(Autowired.class)) {
+                    return;
+                }
+                String beanName = field.getAnnotation(Autowired.class).value();
+                if ("".equals(beanName)) {
+                    // 使用类型的名字
+                    beanName = StringUtils.uncapitalize(field.getType().getSimpleName());
+                }
+                Object autowiredBean = singletonObjects.get(beanName);
+                if (autowiredBean == null) {
+                    throw new RuntimeException("ioc dose not exist bean : " + beanName);
+                }
+                try {
+                    // 进行属性注入
+                    field.setAccessible(true);
+                    field.set(bean, autowiredBean);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 }
