@@ -17,9 +17,16 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SummerWebApplicationContext {
 
+    private final String configLocation;
+
     private final List<String> classFullPathList = new ArrayList<>();
 
     private final ConcurrentHashMap<String, Object> singletonObjects = new ConcurrentHashMap<>();
+
+
+    public SummerWebApplicationContext(String configLocation) {
+        this.configLocation = configLocation;
+    }
 
     /**
      * 测试 init() 方法时, 不能使用 Junit 来测试, 需要启动 Tomcat 来测试
@@ -27,7 +34,7 @@ public class SummerWebApplicationContext {
      */
     public void init() {
         // 获取需要自动扫描包
-        String basePackage = XMLParserUtils.getBasePackage("summerApplicationContext.xml");
+        String basePackage = XMLParserUtils.getBasePackage(configLocation);
         String[] basePackages = basePackage.split(",");
         for (String pack : basePackages) {
             // 对包进行扫描

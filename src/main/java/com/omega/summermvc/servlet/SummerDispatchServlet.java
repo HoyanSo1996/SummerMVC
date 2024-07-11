@@ -20,15 +20,22 @@ import java.io.IOException;
  */
 public class SummerDispatchServlet extends HttpServlet {
 
-    private final SummerWebApplicationContext summerApplicationContext = new SummerWebApplicationContext();
-    private final SummerHandlerMapping summerHandlerMapping = new SummerHandlerMapping();
-    private final SummerHandlerAdapter summerHandlerAdapter = new SummerHandlerAdapter();
+    private SummerWebApplicationContext summerApplicationContext;
+    private SummerHandlerMapping summerHandlerMapping;
+    private SummerHandlerAdapter summerHandlerAdapter;
 
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
+        // 初始化容器
+        summerApplicationContext = new SummerWebApplicationContext(servletConfig.getInitParameter("contextConfigLocation").split(":")[1]);
         summerApplicationContext.init();
+
+        // 初始化处理器映射器
+        summerHandlerMapping = new SummerHandlerMapping();
         summerHandlerMapping.init(summerApplicationContext, servletConfig.getServletContext().getContextPath());
 
+        // 初始化处理器适配器
+        summerHandlerAdapter = new SummerHandlerAdapter();
     }
 
     @Override
