@@ -127,7 +127,7 @@ public class SummerWebApplicationContext {
             Class<?> beanClazz = bean.getClass();
             for (Field field : beanClazz.getDeclaredFields()) {
                 if (!field.isAnnotationPresent(Autowired.class)) {
-                    return;
+                    continue;
                 }
                 String beanName = field.getAnnotation(Autowired.class).value();
                 if ("".equals(beanName)) {

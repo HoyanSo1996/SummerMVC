@@ -4,6 +4,7 @@ import com.omega.summermvc.context.SummerWebApplicationContext;
 import com.omega.summermvc.handler.SummerHandler;
 import com.omega.summermvc.handler.SummerHandlerAdapter;
 import com.omega.summermvc.handler.SummerHandlerMapping;
+import com.omega.summermvc.view.SummerViewResolver;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -23,6 +24,7 @@ public class SummerDispatchServlet extends HttpServlet {
     private SummerWebApplicationContext summerApplicationContext;
     private SummerHandlerMapping summerHandlerMapping;
     private SummerHandlerAdapter summerHandlerAdapter;
+    private SummerViewResolver summerViewResolver;
 
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
@@ -36,6 +38,9 @@ public class SummerDispatchServlet extends HttpServlet {
 
         // 初始化处理器适配器
         summerHandlerAdapter = new SummerHandlerAdapter();
+
+        // 初始化视图解析器
+        summerViewResolver = new SummerViewResolver();
     }
 
     @Override
@@ -49,10 +54,18 @@ public class SummerDispatchServlet extends HttpServlet {
     }
 
     public void doDispatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // 1.调用 HandlerMapping
         SummerHandler handler = summerHandlerMapping.getHandler(request.getRequestURI());
         if (handler == null) {
             response.getWriter().write("<h1>404 NOT FOUND</h1>");
+            return;
         }
-        summerHandlerAdapter.handle(request, response, handler);
+        // 2.调用 HandlerAdapter
+        Object viewName = summerHandlerAdapter.handle(request, response, handler);
+
+        // 3.调用 ViewResolver (兼有 View 功能)
+        if (viewName instanceof String) {
+            summerViewResolver.resolveViewName((String) viewName, request, response);
+        }
     }
 }

@@ -13,4 +13,8 @@ import java.util.List;
 public interface MonsterService {
 
     List<Monster> queryList();
+
+    List<Monster> queryListByName(String name);
+
+    List<Monster> queryListByIdAndName(Integer id, String name);
 }
