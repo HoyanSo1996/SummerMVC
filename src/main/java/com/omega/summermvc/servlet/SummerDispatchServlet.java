@@ -1,9 +1,11 @@
 package com.omega.summermvc.servlet;
 
+import com.omega.summermvc.annotation.ResponseBody;
 import com.omega.summermvc.context.SummerWebApplicationContext;
 import com.omega.summermvc.handler.SummerHandler;
 import com.omega.summermvc.handler.SummerHandlerAdapter;
 import com.omega.summermvc.handler.SummerHandlerMapping;
+import com.omega.summermvc.util.JsonUtils;
 import com.omega.summermvc.view.SummerViewResolver;
 
 import javax.servlet.ServletConfig;
@@ -61,11 +63,19 @@ public class SummerDispatchServlet extends HttpServlet {
             return;
         }
         // 2.调用 HandlerAdapter
-        Object viewName = summerHandlerAdapter.handle(request, response, handler);
+        Object result = summerHandlerAdapter.handle(request, response, handler);
+
+        // 判断是否有 @responseBody 注解
+        if (handler.getMethod().isAnnotationPresent(ResponseBody.class)) {
+            String resultJson = JsonUtils.toJsonString(result);
+            response.setContentType("application/json;charset=utf-8");
+            response.getWriter().write(resultJson);
+            return;
+        }
 
         // 3.调用 ViewResolver (兼有 View 功能)
-        if (viewName instanceof String) {
-            summerViewResolver.resolveViewName((String) viewName, request, response);
+        if (result instanceof String) {
+            summerViewResolver.resolveViewName((String) result, request, response);
         }
     }
 }

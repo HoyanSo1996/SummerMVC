@@ -2,10 +2,7 @@ package com.omega.controller;
 
 import com.omega.entity.Monster;
 import com.omega.service.MonsterService;
-import com.omega.summermvc.annotation.Autowired;
-import com.omega.summermvc.annotation.Controller;
-import com.omega.summermvc.annotation.RequestMapping;
-import com.omega.summermvc.annotation.RequestParam;
+import com.omega.summermvc.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -114,5 +111,11 @@ public class MonsterController {
             request.getSession().setAttribute("name", name);
             return "redirect:/login_fail.jsp";
         }
+    }
+
+    @RequestMapping("/monster/list/json")
+    @ResponseBody
+    public List<Monster> queryListByJson() {
+        return monsterService.queryList();
     }
 }
